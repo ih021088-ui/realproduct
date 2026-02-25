@@ -458,3 +458,29 @@ class AffiliateForm extends HTMLElement {
 customElements.define('animal-face-test', AnimalFaceTest);
 customElements.define('lotto-generator', LottoGenerator);
 customElements.define('affiliate-form', AffiliateForm);
+
+// Privacy Policy Modal Logic
+document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('privacy-modal');
+    const privacyLinks = document.querySelectorAll('a[href="#privacy"]');
+    const closeBtn = document.querySelector('.close-btn');
+
+    if (modal && closeBtn) {
+        privacyLinks.forEach(link => {
+            link.onclick = (e) => {
+                e.preventDefault();
+                modal.style.display = "block";
+            };
+        });
+
+        closeBtn.onclick = () => {
+            modal.style.display = "none";
+        };
+
+        window.onclick = (event) => {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        };
+    }
+});

@@ -32,3 +32,8 @@
 5.  **[Done]** Integrate the Formspree endpoint.
 6.  **[Done]** Refine the visual design and responsiveness.
 7.  **[Done]** Integrate Google AdSense (ads.txt and code snippet).
+8.  **[Current]** AdSense Approval Optimization (High-Quality Content & UX):
+    *   Add Header/Footer navigation.
+    *   Implement "About" and "How-to" content for tools.
+    *   Add Privacy Policy and Terms of Service (AdSense requirement).
+    *   Enhance textual content for SEO and crawler visibility.
