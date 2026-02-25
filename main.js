@@ -1,4 +1,186 @@
 
+class AnimalFaceTest extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+    this.model = null;
+    this.webcam = null;
+    this.maxPredictions = 0;
+    this.isLoaded = false;
+    this.isRunning = false;
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  async init() {
+    const startBtn = this.shadowRoot.querySelector('#start-btn');
+    startBtn.disabled = true;
+    startBtn.textContent = '모델 로딩 중...';
+
+    const URL = "https://teachablemachine.withgoogle.com/models/4X94Avx3l/";
+    const modelURL = URL + "model.json";
+    const metadataURL = URL + "metadata.json";
+
+    try {
+      this.model = await tmImage.load(modelURL, metadataURL);
+      this.maxPredictions = this.model.getTotalClasses();
+
+      const flip = true;
+      this.webcam = new tmImage.Webcam(300, 300, flip);
+      await this.webcam.setup();
+      await this.webcam.play();
+      
+      this.isLoaded = true;
+      this.isRunning = true;
+      this.shadowRoot.querySelector('#webcam-container').appendChild(this.webcam.canvas);
+      startBtn.style.display = 'none';
+      
+      window.requestAnimationFrame(() => this.loop());
+    } catch (error) {
+      console.error(error);
+      alert('카메라 권한이 필요하거나 모델 로딩에 실패했습니다.');
+      startBtn.disabled = false;
+      startBtn.textContent = '다시 시도하기';
+    }
+  }
+
+  async loop() {
+    if (!this.isRunning) return;
+    this.webcam.update();
+    await this.predict();
+    window.requestAnimationFrame(() => this.loop());
+  }
+
+  async predict() {
+    const prediction = await this.model.predict(this.webcam.canvas);
+    const labelContainer = this.shadowRoot.querySelector('#label-container');
+    labelContainer.innerHTML = '';
+
+    prediction.sort((a, b) => b.probability - a.probability);
+
+    prediction.forEach(p => {
+      const percentage = (p.probability * 100).toFixed(0);
+      const row = document.createElement('div');
+      row.className = 'prediction-row';
+      
+      let emoji = '❓';
+      if(p.className.includes('강아지')) emoji = '🐶';
+      if(p.className.includes('고양이')) emoji = '🐱';
+      if(p.className.includes('고릴라')) emoji = '🦍';
+
+      row.innerHTML = `
+        <div class="label-info">
+          <span>${emoji} ${p.className}</span>
+          <span>${percentage}%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: ${percentage}%"></div>
+        </div>
+      `;
+      labelContainer.appendChild(row);
+    });
+  }
+
+  render() {
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: block;
+          width: 100%;
+          max-width: 500px;
+          margin: 0 auto;
+        }
+        .card {
+          background: white;
+          padding: 30px;
+          border-radius: 20px;
+          box-shadow: 0 15px 35px var(--shadow-color, rgba(0,0,0,0.1));
+          text-align: center;
+        }
+        #webcam-container {
+          margin: 20px auto;
+          width: 300px;
+          height: 300px;
+          border-radius: 15px;
+          overflow: hidden;
+          background: #f0f2f5;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 4px solid var(--primary-color, #4a90e2);
+        }
+        canvas {
+          width: 100% !important;
+          height: 100% !important;
+        }
+        #start-btn {
+          background: var(--primary-color, #4a90e2);
+          color: white;
+          border: none;
+          padding: 16px 32px;
+          border-radius: 12px;
+          font-size: 1.1rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+        }
+        #start-btn:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(74, 144, 226, 0.4);
+          background: #357abd;
+        }
+        #start-btn:disabled {
+          background: #ccc;
+          cursor: not-allowed;
+          box-shadow: none;
+        }
+        #label-container {
+          margin-top: 25px;
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+        }
+        .prediction-row {
+          text-align: left;
+        }
+        .label-info {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 5px;
+          font-weight: 600;
+          font-size: 0.95rem;
+          color: #444;
+        }
+        .progress-bar {
+          background: #eee;
+          height: 12px;
+          border-radius: 6px;
+          overflow: hidden;
+        }
+        .progress-fill {
+          height: 100%;
+          background: linear-gradient(90deg, var(--primary-color) 0%, #357abd 100%);
+          transition: width 0.2s ease;
+        }
+      </style>
+      <div class="card">
+        <div id="webcam-container">
+          <span style="color: #888;">카메라 화면이 여기에 표시됩니다</span>
+        </div>
+        <button id="start-btn">테스트 시작하기</button>
+        <div id="label-container"></div>
+      </div>
+    `;
+
+    this.shadowRoot.querySelector('#start-btn').addEventListener('click', () => this.init());
+  }
+}
+
+customElements.define('animal-face-test', AnimalFaceTest);
+
 class LottoGenerator extends HTMLElement {
   constructor() {
     super();

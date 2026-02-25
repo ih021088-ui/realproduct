@@ -1,28 +1,37 @@
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>로또 번호 생성기 & 제휴 문의</title>
+    <title>AI 동물상 테스트 & 로또 명당</title>
     <link rel="stylesheet" href="style.css">
+    <!-- TensorFlow & Teachable Machine Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
 </head>
 <body>
     <main>
+        <section class="hero">
+            <h1>🐾 인공지능 동물상 테스트</h1>
+            <p>나의 얼굴은 어떤 동물을 닮았을까요? 지금 바로 확인해보세요!</p>
+        </section>
+
+        <animal-face-test></animal-face-test>
+        
         <lotto-generator></lotto-generator>
         <affiliate-form></affiliate-form>
         
         <section id="comments" style="width: 100%; margin-top: 40px; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
             <div id="disqus_thread"></div>
             <script>
-                (function() { // DON'T EDIT BELOW THIS LINE
+                (function() {
                 var d = document, s = d.createElement('script');
                 s.src = 'https://productbuilder-tllvyclolq.disqus.com/embed.js';
                 s.setAttribute('data-timestamp', +new Date());
                 (d.head || d.body).appendChild(s);
                 })();
             </script>
-            <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
         </section>
     </main>
     <script src="main.js"></script>
