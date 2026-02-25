@@ -37,20 +37,40 @@ class AnimalFaceTest extends HTMLElement {
     }
 
     const preview = this.shadowRoot.querySelector('#image-preview');
-    const labelContainer = this.shadowRoot.querySelector('#label-container');
     const loadingText = this.shadowRoot.querySelector('#loading-text');
+    const placeholder = this.shadowRoot.querySelector('.placeholder-text');
+    const retryBtn = this.shadowRoot.querySelector('#retry-btn');
 
     const reader = new FileReader();
-    reader.onload = async (e) => {
+    reader.onload = (e) => {
+      preview.onload = async () => {
+        loadingText.textContent = '분석 중...';
+        await this.predict(preview);
+        loadingText.textContent = '분석 완료!';
+        retryBtn.style.display = 'inline-block';
+      };
       preview.src = e.target.result;
       preview.style.display = 'block';
-      this.shadowRoot.querySelector('.placeholder-text').style.display = 'none';
-      
-      loadingText.textContent = '분석 중...';
-      await this.predict(preview);
-      loadingText.textContent = '';
+      placeholder.style.display = 'none';
     };
     reader.readAsDataURL(file);
+  }
+
+  reset() {
+    const preview = this.shadowRoot.querySelector('#image-preview');
+    const labelContainer = this.shadowRoot.querySelector('#label-container');
+    const loadingText = this.shadowRoot.querySelector('#loading-text');
+    const placeholder = this.shadowRoot.querySelector('.placeholder-text');
+    const retryBtn = this.shadowRoot.querySelector('#retry-btn');
+    const fileInput = this.shadowRoot.querySelector('#file-input');
+
+    preview.src = '#';
+    preview.style.display = 'none';
+    placeholder.style.display = 'flex';
+    labelContainer.innerHTML = '';
+    loadingText.textContent = '';
+    retryBtn.style.display = 'none';
+    fileInput.value = '';
   }
 
   async predict(imageElement) {
@@ -66,9 +86,10 @@ class AnimalFaceTest extends HTMLElement {
       row.className = 'prediction-row';
       
       let emoji = '❓';
-      if(p.className.includes('강아지')) emoji = '🐶';
-      if(p.className.includes('고양이')) emoji = '🐱';
-      if(p.className.includes('고릴라')) emoji = '🦍';
+      const className = p.className.toLowerCase();
+      if(className.includes('강아지') || className.includes('dog')) emoji = '🐶';
+      else if(className.includes('고양이') || className.includes('cat')) emoji = '🐱';
+      else if(className.includes('고릴라') || className.includes('gorilla')) emoji = '🦍';
 
       row.innerHTML = `
         <div class="label-info">
@@ -126,6 +147,9 @@ class AnimalFaceTest extends HTMLElement {
           display: none;
         }
         .placeholder-text {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
           color: #718096;
           font-size: 0.9rem;
         }
@@ -170,6 +194,21 @@ class AnimalFaceTest extends HTMLElement {
           background: linear-gradient(90deg, var(--primary-color) 0%, #357abd 100%);
           transition: width 0.5s ease-out;
         }
+        #retry-btn {
+          display: none;
+          margin-top: 20px;
+          background: var(--primary-color);
+          color: white;
+          border: none;
+          padding: 12px 24px;
+          border-radius: 10px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: background 0.3s;
+        }
+        #retry-btn:hover {
+          background: #357abd;
+        }
       </style>
       <div class="card">
         <div class="upload-section">
@@ -182,10 +221,12 @@ class AnimalFaceTest extends HTMLElement {
         </div>
         <div id="loading-text"></div>
         <div id="label-container"></div>
+        <button id="retry-btn">다른 사진으로 다시 하기</button>
       </div>
     `;
 
     this.shadowRoot.querySelector('#file-input').addEventListener('change', (e) => this.handleFileUpload(e));
+    this.shadowRoot.querySelector('#retry-btn').addEventListener('click', () => this.reset());
   }
 }
 
