@@ -1,24 +1,18 @@
-
 class AnimalFaceTest extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
     this.model = null;
-    this.webcam = null;
     this.maxPredictions = 0;
-    this.isLoaded = false;
-    this.isRunning = false;
+    this.isModelLoaded = false;
   }
 
   connectedCallback() {
     this.render();
+    this.loadModel();
   }
 
-  async init() {
-    const startBtn = this.shadowRoot.querySelector('#start-btn');
-    startBtn.disabled = true;
-    startBtn.textContent = '모델 로딩 중...';
-
+  async loadModel() {
     const URL = "https://teachablemachine.withgoogle.com/models/4X94Avx3l/";
     const modelURL = URL + "model.json";
     const metadataURL = URL + "metadata.json";
@@ -26,35 +20,41 @@ class AnimalFaceTest extends HTMLElement {
     try {
       this.model = await tmImage.load(modelURL, metadataURL);
       this.maxPredictions = this.model.getTotalClasses();
-
-      const flip = true;
-      this.webcam = new tmImage.Webcam(300, 300, flip);
-      await this.webcam.setup();
-      await this.webcam.play();
-      
-      this.isLoaded = true;
-      this.isRunning = true;
-      this.shadowRoot.querySelector('#webcam-container').appendChild(this.webcam.canvas);
-      startBtn.style.display = 'none';
-      
-      window.requestAnimationFrame(() => this.loop());
-    } catch (error) {
-      console.error(error);
-      alert('카메라 권한이 필요하거나 모델 로딩에 실패했습니다.');
-      startBtn.disabled = false;
-      startBtn.textContent = '다시 시도하기';
+      this.isModelLoaded = true;
+      console.log("Model Loaded");
+    } catch (e) {
+      console.error("Model Load Error:", e);
     }
   }
 
-  async loop() {
-    if (!this.isRunning) return;
-    this.webcam.update();
-    await this.predict();
-    window.requestAnimationFrame(() => this.loop());
+  async handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!this.isModelLoaded) {
+      alert("모델이 아직 로딩 중입니다. 잠시만 기다려 주세요.");
+      return;
+    }
+
+    const preview = this.shadowRoot.querySelector('#image-preview');
+    const labelContainer = this.shadowRoot.querySelector('#label-container');
+    const loadingText = this.shadowRoot.querySelector('#loading-text');
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      preview.src = e.target.result;
+      preview.style.display = 'block';
+      this.shadowRoot.querySelector('.placeholder-text').style.display = 'none';
+      
+      loadingText.textContent = '분석 중...';
+      await this.predict(preview);
+      loadingText.textContent = '';
+    };
+    reader.readAsDataURL(file);
   }
 
-  async predict() {
-    const prediction = await this.model.predict(this.webcam.canvas);
+  async predict(imageElement) {
+    const prediction = await this.model.predict(imageElement);
     const labelContainer = this.shadowRoot.querySelector('#label-container');
     labelContainer.innerHTML = '';
 
@@ -99,43 +99,48 @@ class AnimalFaceTest extends HTMLElement {
           box-shadow: 0 15px 35px var(--shadow-color, rgba(0,0,0,0.1));
           text-align: center;
         }
-        #webcam-container {
+        .upload-section {
           margin: 20px auto;
-          width: 300px;
+          width: 100%;
           height: 300px;
           border-radius: 15px;
           overflow: hidden;
-          background: #f0f2f5;
+          background: #f8f9fa;
           display: flex;
+          flex-direction: column;
           align-items: center;
           justify-content: center;
-          border: 4px solid var(--primary-color, #4a90e2);
-        }
-        canvas {
-          width: 100% !important;
-          height: 100% !important;
-        }
-        #start-btn {
-          background: var(--primary-color, #4a90e2);
-          color: white;
-          border: none;
-          padding: 16px 32px;
-          border-radius: 12px;
-          font-size: 1.1rem;
-          font-weight: 600;
+          border: 2px dashed #cbd5e0;
           cursor: pointer;
+          position: relative;
           transition: all 0.3s ease;
-          box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
         }
-        #start-btn:hover:not(:disabled) {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 16px rgba(74, 144, 226, 0.4);
-          background: #357abd;
+        .upload-section:hover {
+          border-color: var(--primary-color);
+          background: #f0f7ff;
         }
-        #start-btn:disabled {
-          background: #ccc;
-          cursor: not-allowed;
-          box-shadow: none;
+        #image-preview {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          display: none;
+        }
+        .placeholder-text {
+          color: #718096;
+          font-size: 0.9rem;
+        }
+        #file-input {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          opacity: 0;
+          cursor: pointer;
+        }
+        #loading-text {
+          margin-top: 15px;
+          font-weight: 600;
+          color: var(--primary-color);
+          min-height: 1.2rem;
         }
         #label-container {
           margin-top: 25px;
@@ -163,23 +168,26 @@ class AnimalFaceTest extends HTMLElement {
         .progress-fill {
           height: 100%;
           background: linear-gradient(90deg, var(--primary-color) 0%, #357abd 100%);
-          transition: width 0.2s ease;
+          transition: width 0.5s ease-out;
         }
       </style>
       <div class="card">
-        <div id="webcam-container">
-          <span style="color: #888;">카메라 화면이 여기에 표시됩니다</span>
+        <div class="upload-section">
+          <img id="image-preview" src="#" alt="Preview">
+          <div class="placeholder-text">
+            <span style="font-size: 3rem; display: block; margin-bottom: 10px;">📸</span>
+            <span>클릭하여 사진을 업로드하거나 찍으세요</span>
+          </div>
+          <input type="file" id="file-input" accept="image/*">
         </div>
-        <button id="start-btn">테스트 시작하기</button>
+        <div id="loading-text"></div>
         <div id="label-container"></div>
       </div>
     `;
 
-    this.shadowRoot.querySelector('#start-btn').addEventListener('click', () => this.init());
+    this.shadowRoot.querySelector('#file-input').addEventListener('change', (e) => this.handleFileUpload(e));
   }
 }
-
-customElements.define('animal-face-test', AnimalFaceTest);
 
 class LottoGenerator extends HTMLElement {
   constructor() {
@@ -406,5 +414,6 @@ class AffiliateForm extends HTMLElement {
   }
 }
 
+customElements.define('animal-face-test', AnimalFaceTest);
 customElements.define('lotto-generator', LottoGenerator);
 customElements.define('affiliate-form', AffiliateForm);
