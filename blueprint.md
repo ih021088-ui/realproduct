@@ -13,6 +13,8 @@ A modern web application that generates random lottery numbers and provides a pl
     *   Clean, modern form for partnership inquiries.
     *   Integrated with Formspree for backend processing.
     *   Responsive design using modern CSS.
+*   **Community Interaction:**
+    *   Disqus comment section for user feedback and engagement.
 *   **Visual Aesthetics:**
     *   expressive typography and vibrant colors.
     *   Subtle textures and deep shadows for a premium feel.
