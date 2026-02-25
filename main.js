@@ -8,13 +8,13 @@ class LottoGenerator extends HTMLElement {
     wrapper.setAttribute('class', 'lotto-card');
 
     const title = document.createElement('h1');
-    title.textContent = 'Lotto Number Generator';
+    title.textContent = '로또 번호 생성기';
 
     const numbersContainer = document.createElement('div');
     numbersContainer.setAttribute('class', 'numbers-container');
 
     const button = document.createElement('button');
-    button.textContent = 'Generate Numbers';
+    button.textContent = '번호 생성하기';
     button.addEventListener('click', () => this.generateAndDisplayNumbers());
 
     const style = document.createElement('style');
@@ -122,22 +122,22 @@ class AffiliateForm extends HTMLElement {
     container.setAttribute('class', 'form-container');
 
     container.innerHTML = `
-      <h2>Partnership Inquiry</h2>
-      <p>Interested in collaborating? Fill out the form below!</p>
+      <h2>제휴 문의</h2>
+      <p>협업에 관심이 있으신가요? 아래 폼을 작성해 주세요!</p>
       <form action="https://formspree.io/f/xkovkyol" method="POST">
         <div class="field">
-          <label for="name">Name</label>
-          <input type="text" id="name" name="name" placeholder="Your Full Name" required>
+          <label for="name">이름</label>
+          <input type="text" id="name" name="name" placeholder="성함을 입력해 주세요" required>
         </div>
         <div class="field">
-          <label for="email">Email</label>
-          <input type="email" id="email" name="_replyto" placeholder="your@email.com" required>
+          <label for="email">이메일</label>
+          <input type="email" id="email" name="_replyto" placeholder="이메일 주소를 입력해 주세요" required>
         </div>
         <div class="field">
-          <label for="message">Message</label>
-          <textarea id="message" name="message" placeholder="Tell us about your proposal..." rows="4" required></textarea>
+          <label for="message">메시지</label>
+          <textarea id="message" name="message" placeholder="문의 내용을 입력해 주세요..." rows="4" required></textarea>
         </div>
-        <button type="submit">Send Inquiry</button>
+        <button type="submit">문의 보내기</button>
       </form>
     `;
 

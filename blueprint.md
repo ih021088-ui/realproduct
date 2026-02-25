@@ -1,24 +1,24 @@
-# Lotto Number Generator & Partnership
+# 로또 번호 생성기 & 제휴 문의 사이트
 
-## Overview
+## 개요
 
-A modern web application that generates random lottery numbers and provides a platform for potential partners to reach out via an integrated form.
+무작위 로또 번호를 생성하고, 통합된 폼을 통해 잠재적 파트너가 연락할 수 있는 현대적인 웹 애플리케이션입니다.
 
-## Design and Features
+## 디자인 및 주요 기능
 
-*   **Lotto Generator:**
-    *   Generates 6 unique random numbers (1-45).
-    *   Animated and responsive UI.
-*   **Affiliate/Partnership Form:**
-    *   Clean, modern form for partnership inquiries.
-    *   Integrated with Formspree for backend processing.
-    *   Responsive design using modern CSS.
-*   **Community Interaction:**
-    *   Disqus comment section for user feedback and engagement.
-*   **Visual Aesthetics:**
-    *   expressive typography and vibrant colors.
-    *   Subtle textures and deep shadows for a premium feel.
-    *   Mobile-first, responsive layout.
+*   **로또 생성기:**
+    *   6개의 고유한 난수(1-45)를 생성합니다.
+    *   애니메이션이 적용된 반응형 UI를 제공합니다.
+*   **제휴 문의 폼:**
+    *   제휴 문의를 위한 깔끔하고 현대적인 폼입니다.
+    *   백엔드 처리를 위해 Formspree와 통합되었습니다.
+    *   최신 CSS를 사용한 반응형 디자인을 적용했습니다.
+*   **커뮤니티 소통:**
+    *   사용자 피드백과 참여를 위한 Disqus 댓글 섹션을 포함합니다.
+*   **시각적 미학:**
+    *   표현력이 풍부한 타이포그래피와 활기찬 색상을 사용합니다.
+    *   고급스러운 느낌을 위해 미세한 질감과 깊은 그림자를 적용했습니다.
+    *   모바일 우선의 반응형 레이아웃을 제공합니다.
 
 ## Technology Stack
 
